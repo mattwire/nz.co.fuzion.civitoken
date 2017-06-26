@@ -68,9 +68,9 @@ function latestcurrentmembership_get_tokens($cid, &$value, $onlyActive) {
     'financial_type_id' => "Member Dues",
   ));
   foreach ($membershipTypes['values'] as $typeId => $val) {
-    $types[] = $typeId;
+    $types[] = $val['name'];
   }
-  $params['membership_type_id'] = $types;
+  $params['membership_type_id'] = array('IN' => $types);
 
   static $statuses;
   if (empty($statuses)) {
