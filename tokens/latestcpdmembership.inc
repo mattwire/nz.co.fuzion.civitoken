@@ -104,7 +104,7 @@ function latestcpdmembership_get_tokens($cid, &$value, $onlyActive) {
     foreach ($lineItems['values'] as $id => $values) {
       $value['latestcpdmembership.' . $prefix . 'fee_' . $feeId] = $values['line_total'];
       $value['latestcpdmembership.' . $prefix . 'fee_' . $feeId . '_label'] = $values['label'];
-      $value['latestcpdmembership.' . $prefix . 'fee_' . $feeId . '_qty'] = $values['qty'];
+      $value['latestcpdmembership.' . $prefix . 'fee_' . $feeId . '_qty'] = (float)$values['qty'];
       $value['latestcpdmembership.' . $prefix . 'fee_' . $feeId . '_unit_price'] = $values['unit_price'];
       $value['latestcpdmembership.' . $prefix . 'fee_' . $feeId . '_tax'] = $values['tax_amount'];
       $feeId++;
