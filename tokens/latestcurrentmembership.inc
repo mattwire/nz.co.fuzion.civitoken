@@ -30,10 +30,12 @@ function latestcurrentmembership_civitoken_declare($token){
     $tokens[$token . '.fee_'.$i.'_label'] = 'Latest Current Membership Fee Label (Line item '.$i.')';
     $tokens[$token . '.fee_'.$i.'_qty'] = 'Latest Current Membership Fee Quantity (Line item '.$i.')';
     $tokens[$token . '.fee_'.$i.'_unit_price'] = 'Latest Current Membership Fee Unit Price (Line item '.$i.')';
+    $tokens[$token . '.fee_'.$i.'_tax'] = 'Latest Current Membership Fee Tax (Line item '.$i.')';
     $tokens[$token . '.allfee_'.$i] = 'Latest Membership Fee (Line item '.$i.')';
     $tokens[$token . '.allfee_'.$i.'_label'] = 'Latest Membership Fee Label (Line item '.$i.')';
     $tokens[$token . '.allfee_'.$i.'_qty'] = 'Latest Membership Fee Quantity (Line item '.$i.')';
     $tokens[$token . '.allfee_'.$i.'_unit_price'] = 'Latest Membership Fee Unit Price (Line item '.$i.')';
+    $tokens[$token . '.allfee_'.$i.'_tax'] = 'Latest Membership Fee Tax (Line item '.$i.')';
   }
 
   return $tokens;
@@ -110,6 +112,7 @@ function latestcurrentmembership_get_tokens($cid, &$value, $onlyActive) {
       $value['latestcurrentmembership.' . $prefix . 'fee_' . $feeId . '_label'] = $values['label'];
       $value['latestcurrentmembership.' . $prefix . 'fee_' . $feeId . '_qty'] = $values['qty'];
       $value['latestcurrentmembership.' . $prefix . 'fee_' . $feeId . '_unit_price'] = $values['unit_price'];
+      $value['latestcurrentmembership.' . $prefix . 'fee_' . $feeId . '_tax'] = $values['tax_amount'];
       $feeId++;
     }
   }

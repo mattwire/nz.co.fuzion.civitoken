@@ -30,10 +30,12 @@ function latestcpdmembership_civitoken_declare($token){
     $tokens[$token . '.fee_'.$i.'_label'] = 'Latest Current CPD Fee Label (Line item '.$i.')';
     $tokens[$token . '.fee_'.$i.'_qty'] = 'Latest Current CPD Fee Quantity (Line item '.$i.')';
     $tokens[$token . '.fee_'.$i.'_unit_price'] = 'Latest Current CPD Fee Unit Price (Line item '.$i.')';
+    $tokens[$token . '.fee_'.$i.'_tax'] = 'Latest Current CPD Fee Tax (Line item '.$i.')';
     $tokens[$token . '.allfee_'.$i] = 'Latest CPD Fee (Line item '.$i.')';
     $tokens[$token . '.allfee_'.$i.'_label'] = 'Latest CPD Fee Label (Line item '.$i.')';
     $tokens[$token . '.allfee_'.$i.'_qty'] = 'Latest CPD Fee Quantity (Line item '.$i.')';
     $tokens[$token . '.allfee_'.$i.'_unit_price'] = 'Latest CPD Fee Unit Price (Line item '.$i.')';
+    $tokens[$token . '.allfee_'.$i.'_tax'] = 'Latest CPD Fee Tax (Line item '.$i.')';
   }
 
   return $tokens;
@@ -104,6 +106,7 @@ function latestcpdmembership_get_tokens($cid, &$value, $onlyActive) {
       $value['latestcpdmembership.' . $prefix . 'fee_' . $feeId . '_label'] = $values['label'];
       $value['latestcpdmembership.' . $prefix . 'fee_' . $feeId . '_qty'] = $values['qty'];
       $value['latestcpdmembership.' . $prefix . 'fee_' . $feeId . '_unit_price'] = $values['unit_price'];
+      $value['latestcpdmembership.' . $prefix . 'fee_' . $feeId . '_tax'] = $values['tax_amount'];
       $feeId++;
     }
   }
