@@ -1,7 +1,7 @@
 <?php
 
 function latestcurrentmembership_civitoken_declare($token){
-  return array(
+  $tokens = array(
     $token . '.type' => 'Latest Current Membership Type',
     $token . '.end_date' => 'Latest Current Membership End Date',
     $token . '.end_date_raw' => 'Latest Current Membership End Date (raw)',
@@ -10,6 +10,7 @@ function latestcurrentmembership_civitoken_declare($token){
     $token . '.join_date' => 'Latest Current Membership Join Date',
     $token . '.join_date_raw' => 'Latest Current Membership Join Date (raw)',
     $token . '.fee' => 'Latest Current Membership Fee',
+    $token . '.fee_total' => 'Latest Current Membership Fee Total',
     $token . '.status' => 'Latest Current Membership Status',
     $token . '.alltype' => 'Latest Membership Type',
     $token . '.allend_date' => 'Latest Membership End Date',
@@ -19,8 +20,23 @@ function latestcurrentmembership_civitoken_declare($token){
     $token . '.alljoin_date' => 'Latest Membership Join Date',
     $token . '.alljoin_date_raw' => 'Latest Membership Join Date (raw)',
     $token . '.allfee' => 'Latest Membership Fee',
+    $token . '.allfee_total' => 'Latest Current Membership Fee Total',
     $token . '.allstatus' => 'Latest Membership Status',
   );
+
+  // Add lineitem tokens
+  for ($i=0;$i<10;$i++) {
+    $tokens[$token . '.fee_'.$i] = 'Latest Current Membership Fee (Line item '.$i.')';
+    $tokens[$token . '.fee_'.$i.'_label'] = 'Latest Current Membership Fee Label (Line item '.$i.')';
+    $tokens[$token . '.fee_'.$i.'_qty'] = 'Latest Current Membership Fee Quantity (Line item '.$i.')';
+    $tokens[$token . '.fee_'.$i.'_unit_price'] = 'Latest Current Membership Fee Unit Price (Line item '.$i.')';
+    $tokens[$token . '.allfee_'.$i] = 'Latest Membership Fee (Line item '.$i.')';
+    $tokens[$token . '.allfee_'.$i.'_label'] = 'Latest Membership Fee Label (Line item '.$i.')';
+    $tokens[$token . '.allfee_'.$i.'_qty'] = 'Latest Membership Fee Quantity (Line item '.$i.')';
+    $tokens[$token . '.allfee_'.$i.'_unit_price'] = 'Latest Membership Fee Unit Price (Line item '.$i.')';
+  }
+
+  return $tokens;
 }
 
 
@@ -45,6 +61,15 @@ function latestcurrentmembership_get_tokens($cid, &$value, $onlyActive) {
     $prefix = '';
   }
 
+  // Only get memberships with financial type "Member Dues"
+  $membershipTypes = civicrm_api3('MembershipType', 'get', array(
+    'financial_type_id' => "Member Dues",
+  ));
+  foreach ($membershipTypes['values'] as $typeId => $val) {
+    $types[] = $typeId;
+  }
+  $params['membership_type_id'] = $types;
+
   static $statuses;
   if (empty($statuses)) {
     $statuses = civicrm_api3('membership', 'getoptions', array('field' => 'status_id'));
@@ -59,6 +84,34 @@ function latestcurrentmembership_get_tokens($cid, &$value, $onlyActive) {
       $value['latestcurrentmembership.' . $prefix . $token] = NULL;
     }
     return $value;
+  }
+
+  // Get the contribution_id
+  $membershipPayment = civicrm_api3('MembershipPayment', 'getsingle', array(
+    'membership_id' => $membership['id'],
+  ));
+
+  // Get the contribution (for total amount)
+  $contribution = civicrm_api3('Contribution', 'getsingle', array(
+    'id' => $membershipPayment['contribution_id'],
+  ));
+  if (!CRM_Utils_Array::value('is_error', $contribution)) {
+    $value['latestcurrentmembership.' . $prefix . 'fee_total'] = $contribution['total_amount'];
+  }
+
+  // Get the lineitems
+  $lineItems = civicrm_api3('LineItem', 'get', array(
+    'contribution_id' => $membershipPayment['contribution_id'],
+  ));
+  if (!CRM_Utils_Array::value('is_error', $lineItems)) {
+    $feeId = 0;
+    foreach ($lineItems['values'] as $id => $values) {
+      $value['latestcurrentmembership.' . $prefix . 'fee_' . $feeId] = $values['line_total'];
+      $value['latestcurrentmembership.' . $prefix . 'fee_' . $feeId . '_label'] = $values['label'];
+      $value['latestcurrentmembership.' . $prefix . 'fee_' . $feeId . '_qty'] = $values['qty'];
+      $value['latestcurrentmembership.' . $prefix . 'fee_' . $feeId . '_unit_price'] = $values['unit_price'];
+      $feeId++;
+    }
   }
 
   if (!CRM_Utils_Array::value('is_error', $membership)) {
