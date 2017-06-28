@@ -82,10 +82,12 @@ function latestcpdmembership_get_tokens($cid, &$value, $onlyActive) {
     return $value;
   }
 
-  // Get the contribution_id
-  $membershipPayment = civicrm_api3('MembershipPayment', 'getsingle', array(
+  // Get the contribution_id (we just want the latest membership payment)
+  $paymentParams = array(
     'membership_id' => $membership['id'],
-  ));
+    'options' => array('limit' => 1, 'sort' => "id DESC"),
+  );
+  $membershipPayment = civicrm_api3('MembershipPayment', 'getsingle', $paymentParams);
 
   // Get the contribution (for total amount)
   $contribution = civicrm_api3('Contribution', 'getsingle', array(
