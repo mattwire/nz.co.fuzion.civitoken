@@ -1,5 +1,7 @@
 <?php
 
+define('CIVITOKEN_FINANCIAL_TYPE_MEMBERSHIP', 2); // "Member Dues"
+
 function latestcurrentmembership_civitoken_declare($token){
   $tokens = array(
     $token . '.type' => 'Latest Current Membership Type',
@@ -65,7 +67,7 @@ function latestcurrentmembership_get_tokens($cid, &$value, $onlyActive) {
 
   // Only get memberships with financial type "Member Dues"
   $membershipTypes = civicrm_api3('MembershipType', 'get', array(
-    'financial_type_id' => "Member Dues",
+    'financial_type_id' => CIVITOKEN_FINANCIAL_TYPE_MEMBERSHIP,
   ));
   foreach ($membershipTypes['values'] as $typeId => $val) {
     $types[] = $val['name'];
@@ -93,12 +95,25 @@ function latestcurrentmembership_get_tokens($cid, &$value, $onlyActive) {
     'membership_id' => $membership['id'],
     'options' => array('limit' => 1, 'sort' => "id DESC"),
   );
-  $membershipPayment = civicrm_api3('MembershipPayment', 'getsingle', $paymentParams);
+  try {
+    $membershipPayment = civicrm_api3('MembershipPayment', 'getsingle', $paymentParams);
+  }
+  catch (Exception $e) {
+    Civi::log()->warning('nz.co.fuzion.civitoken - Could not get membershipPayment: '.$e->getMessage());
+    return array();
+  }
 
-  // Get the contribution (for total amount)
-  $contribution = civicrm_api3('Contribution', 'getsingle', array(
-    'id' => $membershipPayment['contribution_id'],
-  ));
+  try {
+    // Get the contribution (for total amount)
+    $contribution = civicrm_api3('Contribution', 'getsingle', array(
+      'id' => $membershipPayment['contribution_id'],
+    ));
+  }
+  catch (Exception $e) {
+    Civi::log()->warning('nz.co.fuzion.civitoken - Could not get membershipPayment: '.$e->getMessage());
+    return array();
+  }
+
   if (!CRM_Utils_Array::value('is_error', $contribution)) {
     $value['latestcurrentmembership.' . $prefix . 'fee_total'] = $contribution['total_amount'];
   }
