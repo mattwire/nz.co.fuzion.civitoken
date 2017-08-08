@@ -43,7 +43,6 @@ function latestcurrentmembership_civitoken_declare($token){
   return $tokens;
 }
 
-
 function latestcurrentmembership_civitoken_get($cid, &$value, $context){
   latestcurrentmembership_get_tokens($cid, $value, FALSE);
   latestcurrentmembership_get_tokens($cid, $value, TRUE);
@@ -56,7 +55,6 @@ function latestcurrentmembership_get_tokens($cid, &$value, $onlyActive) {
     'sequential' => 1,
     'api.membership_type.getsingle' => 1,
     'options' => array('limit' => 1, 'sort' => 'end_date DESC'),
-    //'return' => array('membership_end_date', 'end_date', 'start_date', 'status_id', 'minimum_fee', 'membership_name', 'id', 'membership_type_id'),
   );
   $prefix = 'all';
   if ($onlyActive) {
@@ -100,37 +98,44 @@ function latestcurrentmembership_get_tokens($cid, &$value, $onlyActive) {
   }
   catch (Exception $e) {
     Civi::log()->warning('nz.co.fuzion.civitoken - Could not get membershipPayment: '.$e->getMessage());
-    return array();
   }
 
-  try {
-    // Get the contribution (for total amount)
-    $contribution = civicrm_api3('Contribution', 'getsingle', array(
-      'id' => $membershipPayment['contribution_id'],
+  if (isset($membershipPayment)) {
+    try {
+      // Get the contribution (for total amount)
+      $contribution = civicrm_api3('Contribution', 'getsingle', array(
+        'id' => $membershipPayment['contribution_id'],
+      ));
+    } catch (Exception $e) {
+      Civi::log()
+        ->warning('nz.co.fuzion.civitoken - Could not get membershipPayment: ' . $e->getMessage());
+    }
+  }
+
+  if (isset($contribution)) {
+    if (!CRM_Utils_Array::value('is_error', $contribution)) {
+      $value['latestcurrentmembership.' . $prefix . 'fee_total'] = $contribution['total_amount'];
+    }
+  }
+  else {
+    $value['latestcurrentmembership.' . $prefix . 'fee_total'] = NULL;
+  }
+
+  if (isset($membershipPayment)) {
+    // Get the lineitems
+    $lineItems = civicrm_api3('LineItem', 'get', array(
+      'contribution_id' => $membershipPayment['contribution_id'],
     ));
-  }
-  catch (Exception $e) {
-    Civi::log()->warning('nz.co.fuzion.civitoken - Could not get membershipPayment: '.$e->getMessage());
-    return array();
-  }
-
-  if (!CRM_Utils_Array::value('is_error', $contribution)) {
-    $value['latestcurrentmembership.' . $prefix . 'fee_total'] = $contribution['total_amount'];
-  }
-
-  // Get the lineitems
-  $lineItems = civicrm_api3('LineItem', 'get', array(
-    'contribution_id' => $membershipPayment['contribution_id'],
-  ));
-  if (!CRM_Utils_Array::value('is_error', $lineItems)) {
-    $feeId = 0;
-    foreach ($lineItems['values'] as $id => $values) {
-      $value['latestcurrentmembership.' . $prefix . 'fee_' . $feeId] = $values['line_total'];
-      $value['latestcurrentmembership.' . $prefix . 'fee_' . $feeId . '_label'] = $values['label'];
-      $value['latestcurrentmembership.' . $prefix . 'fee_' . $feeId . '_qty'] = (float)$values['qty'];
-      $value['latestcurrentmembership.' . $prefix . 'fee_' . $feeId . '_unit_price'] = $values['unit_price'];
-      $value['latestcurrentmembership.' . $prefix . 'fee_' . $feeId . '_tax'] = $values['tax_amount'];
-      $feeId++;
+    if (!CRM_Utils_Array::value('is_error', $lineItems)) {
+      $feeId = 0;
+      foreach ($lineItems['values'] as $id => $values) {
+        $value['latestcurrentmembership.' . $prefix . 'fee_' . $feeId] = $values['line_total'];
+        $value['latestcurrentmembership.' . $prefix . 'fee_' . $feeId . '_label'] = $values['label'];
+        $value['latestcurrentmembership.' . $prefix . 'fee_' . $feeId . '_qty'] = (float) $values['qty'];
+        $value['latestcurrentmembership.' . $prefix . 'fee_' . $feeId . '_unit_price'] = $values['unit_price'];
+        $value['latestcurrentmembership.' . $prefix . 'fee_' . $feeId . '_tax'] = $values['tax_amount'];
+        $feeId++;
+      }
     }
   }
 
