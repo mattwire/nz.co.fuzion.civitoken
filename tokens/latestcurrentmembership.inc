@@ -1,6 +1,6 @@
 <?php
 
-define('CIVITOKEN_FINANCIAL_TYPE_MEMBERSHIP', 2); // "Member Dues"
+define('CIVITOKEN_FINANCIAL_TYPE_MEMBERSHIP', array(2, 42, 72, 81)); // "Member Dues", Historical Member dues, membership inc vat, membership no vat
 
 function latestcurrentmembership_civitoken_declare($token){
   $tokens = array(
@@ -22,7 +22,7 @@ function latestcurrentmembership_civitoken_declare($token){
     $token . '.alljoin_date' => 'Latest Membership Join Date',
     $token . '.alljoin_date_raw' => 'Latest Membership Join Date (raw)',
     $token . '.allfee' => 'Latest Membership Fee',
-    $token . '.allfee_total' => 'Latest Current Membership Fee Total',
+    $token . '.allfee_total' => 'Latest Membership Fee Total',
     $token . '.allstatus' => 'Latest Membership Status',
   );
 
