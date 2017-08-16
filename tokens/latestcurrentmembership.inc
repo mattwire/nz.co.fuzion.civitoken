@@ -51,7 +51,7 @@ function latestcurrentmembership_civitoken_get($cid, &$value, $context){
  * @return array
  */
 function latestcurrentmembership_civitoken_getMembershipFinancialTypes() {
-  return array(2, 42, 72, 81); // "Member Dues", Historical Member dues, membership inc vat, membership no vat
+  return array('IN' => array(2, 42, 72, 81)); // "Member Dues", Historical Member dues, membership inc vat, membership no vat
 }
 
 
@@ -72,7 +72,7 @@ function latestcurrentmembership_get_tokens($cid, &$value, $onlyActive) {
 
   // Only get memberships with financial type "Member Dues"
   $membershipTypes = civicrm_api3('MembershipType', 'get', array(
-    'financial_type_id' => latestcurrentmembership_civitoken_getMembershipFinancialTypes(),
+    'financial_type_id' => _aor_getMembershipFinancialTypes(),
   ));
   foreach ($membershipTypes['values'] as $typeId => $val) {
     $types[] = $val['name'];
