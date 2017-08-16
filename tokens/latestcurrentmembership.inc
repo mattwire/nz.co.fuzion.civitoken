@@ -46,15 +46,6 @@ function latestcurrentmembership_civitoken_get($cid, &$value, $context){
   latestcurrentmembership_get_tokens($cid, $value, TRUE);
 }
 
-/**
- * Returns array of financial type Ids used for membership. Use in api calls relating to membership
- * @return array
- */
-function latestcurrentmembership_civitoken_getMembershipFinancialTypes() {
-  return array('IN' => array(2, 42, 72, 81)); // "Member Dues", Historical Member dues, membership inc vat, membership no vat
-}
-
-
 function latestcurrentmembership_get_tokens($cid, &$value, $onlyActive) {
   $params = array(
     'version' => 3,
