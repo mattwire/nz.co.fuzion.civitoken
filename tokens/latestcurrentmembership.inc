@@ -70,11 +70,6 @@ function latestcurrentmembership_get_tokens($cid, &$value, $onlyActive) {
   }
   $params['membership_type_id'] = array('IN' => $types);
 
-  static $statuses;
-  if (empty($statuses)) {
-    $statuses = civicrm_api3('membership', 'getoptions', array('field' => 'status_id'));
-    $statuses = $statuses['values'];
-  }
   try {
     $membership = civicrm_api3('membership', 'getsingle', $params);
   }
@@ -137,6 +132,7 @@ function latestcurrentmembership_get_tokens($cid, &$value, $onlyActive) {
     }
   }
 
+  $statuses = CRM_Member_PseudoConstant::membershipStatus();
   if (!CRM_Utils_Array::value('is_error', $membership)) {
     $value['latestcurrentmembership.' . $prefix . 'type'] = $membership['api.membership_type.getsingle']['name'];
     $value['latestcurrentmembership.' . $prefix . 'end_date'] = !empty($membership['end_date']) ? CRM_Utils_Date::customFormat($membership['end_date']) : '';
