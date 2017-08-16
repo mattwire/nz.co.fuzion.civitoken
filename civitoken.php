@@ -177,3 +177,19 @@ function civitoken_initialize() {
   $civitoken_init = 1;
   return $tokens;
 }
+
+/**
+ * Implements hook_civicrm_check().
+ * Not implemented in Civi 4.6
+ */
+function civitoken_civicrm_check(&$messages) {
+  // Make sure aor extension is loaded
+  if (!CRM_Extension_System::singleton()->getMapper()->isActiveModule('aor')) {
+    $messages[] = new CRM_Utils_Check_Message(
+      'civitoken_aor',
+      ts('This version of civitoken requires the extension "uk.co.mjwconsult.aor".'),
+      ts('AoR extension Required'),
+      \Psr\Log\LogLevel::CRITICAL
+    );
+  }
+}

@@ -13,8 +13,8 @@
     <url desc="Documentation">https://github.com/mattwire/nz.co.fuzion.civitoken</url>
     <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
   </urls>
-  <releaseDate>2017-08-14</releaseDate>
-  <version>1.0.aor3</version>
+  <releaseDate>2017-08-16</releaseDate>
+  <version>1.0.aor4</version>
   <develStage>stable</develStage>
   <compatibility>
     <ver>4.4</ver>
