@@ -122,11 +122,11 @@ function latestcurrentmembership_get_tokens($cid, &$value, $onlyActive) {
     if (!CRM_Utils_Array::value('is_error', $lineItems)) {
       $feeId = 0;
       foreach ($lineItems['values'] as $id => $values) {
-        $value['latestcurrentmembership.' . $prefix . 'fee_' . $feeId] = $values['line_total'];
+        $value['latestcurrentmembership.' . $prefix . 'fee_' . $feeId] = CRM_Utils_Money::format($values['line_total']);
         $value['latestcurrentmembership.' . $prefix . 'fee_' . $feeId . '_label'] = $values['label'];
         $value['latestcurrentmembership.' . $prefix . 'fee_' . $feeId . '_qty'] = (float) $values['qty'];
-        $value['latestcurrentmembership.' . $prefix . 'fee_' . $feeId . '_unit_price'] = $values['unit_price'];
-        $value['latestcurrentmembership.' . $prefix . 'fee_' . $feeId . '_tax'] = $values['tax_amount'];
+        $value['latestcurrentmembership.' . $prefix . 'fee_' . $feeId . '_unit_price'] = CRM_Utils_Money::format($values['unit_price']);
+        $value['latestcurrentmembership.' . $prefix . 'fee_' . $feeId . '_tax'] = CRM_Utils_Money::format($values['tax_amount']);
         $feeId++;
       }
     }
@@ -141,7 +141,7 @@ function latestcurrentmembership_get_tokens($cid, &$value, $onlyActive) {
     $value['latestcurrentmembership.' . $prefix . 'start_date_raw'] = CRM_Utils_Date::customFormat($membership['start_date'],"%Y%m%d");
     $value['latestcurrentmembership.' . $prefix . 'join_date'] = CRM_Utils_Date::customFormat($membership['join_date']);
     $value['latestcurrentmembership.' . $prefix . 'join_date_raw'] = CRM_Utils_Date::customFormat($membership['join_date'],"%Y%m%d");
-    $value['latestcurrentmembership.' . $prefix . 'fee'] = $membership['api.membership_type.getsingle']['minimum_fee'];
+    $value['latestcurrentmembership.' . $prefix . 'fee'] = CRM_Utils_Money::format($membership['api.membership_type.getsingle']['minimum_fee']);
     $value['latestcurrentmembership.' . $prefix . 'status'] = $statuses[$membership['status_id']];
   }
   return $value;
